@@ -22,6 +22,7 @@
     "firebase-functions": "^6.1.2",
     "firebase-functions-test": "^3.3.0",
     "nodemon": "^3.1.7",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+     "@google-cloud/functions-framework": "^3.1.0"
   }
 }
