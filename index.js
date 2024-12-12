@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
+const functions = require("firebase-functions")
 
 const app = express();
 const PORT = 3001;
@@ -45,8 +46,9 @@ const createArticlesTable = async () => {
 // Panggil fungsi createArticlesTable saat server mulai
 createArticlesTable();
 
-app.get("/",()=>{
+app.get("/",(req,res)=>{
     console.log("welcome app")
+    return res.json("welcome app")
 })
 
 // Endpoint untuk mendapatkan semua artikel
@@ -113,4 +115,4 @@ app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
 
-exports.articlesApi =app
+exports.app = functions.https.onRequest(app)
