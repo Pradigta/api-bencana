@@ -115,4 +115,4 @@ app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
 
-exports.api = app
+exports.app = functions.https.onRequest(app)
