@@ -46,10 +46,10 @@ const createArticlesTable = async () => {
 // Panggil fungsi createArticlesTable saat server mulai
 createArticlesTable();
 
-app.get("/",(req,res)=>{
-    console.log("welcome app")
-    return res.json("welcome app")
-})
+app.get('/', (req, res) => {
+    return res.json('message: hello world');
+    return res.status(200);
+  });
 
 // Endpoint untuk mendapatkan semua artikel
 app.get('/articles', async (req, res) => {
