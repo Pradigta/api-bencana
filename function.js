@@ -178,9 +178,9 @@ app.delete('/education/:id', async (req, res) => {
 });
 
 // Jalankan server
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server berjalan di http://localhost:${PORT}`);
+// });
 
 // Ekspor aplikasi sebagai fungsi untuk Firebase
-// exports.app = functions.https.onRequest(app);
+exports.app = functions.https.onRequest(app);
