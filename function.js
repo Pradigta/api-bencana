@@ -228,9 +228,9 @@ app.get('/evaluasi/:id', async (req, res) => {
 
 app.use("/public/upload", express.static("public/upload"))
 
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server berjalan di http://localhost:${PORT}`);
+// });
 
-// Ekspor aplikasi sebagai fungsi untuk Firebase
-// exports.app = functions.https.onRequest(app);
+Ekspor aplikasi sebagai fungsi untuk Firebase
+exports.app = functions.https.onRequest(app);
