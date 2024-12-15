@@ -3,10 +3,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
 const functions = require("firebase-functions");
+const upload = require("./multer")
 
 //tes
 const app = express();
 const PORT = 3002;
+
 
 // Konfigurasi koneksi PostgreSQL
 const pool = new Pool({
@@ -21,38 +23,38 @@ const pool = new Pool({
 app.use(bodyParser.json());
 app.use(cors());
 
-// Fungsi untuk membuat tabel articles dan education
-const createTables = async () => {
-  const createArticlesQuery = `
-    CREATE TABLE IF NOT EXISTS articles (
-      id SERIAL PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      content TEXT NOT NULL,
-      category VARCHAR(100),
-      date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+// // Fungsi untuk membuat tabel articles dan education
+// const createTables = async () => {
+//   const createArticlesQuery = `
+//     CREATE TABLE IF NOT EXISTS articles (
+//       id SERIAL PRIMARY KEY,
+//       title VARCHAR(255) NOT NULL,
+//       content TEXT NOT NULL,
+//       category VARCHAR(100),
+//       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+//     );
+//   `;
   
-  const createEducationQuery = `
-    CREATE TABLE IF NOT EXISTS education (
-      id SERIAL PRIMARY KEY,
-      disaster VARCHAR(255) NOT NULL,
-      mitigation TEXT NOT NULL,
-      tips TEXT NOT NULL
-    );
-  `;
+//   const createEducationQuery = `
+//     CREATE TABLE IF NOT EXISTS education (
+//       id SERIAL PRIMARY KEY,
+//       disaster VARCHAR(255) NOT NULL,
+//       mitigation TEXT NOT NULL,
+//       tips TEXT NOT NULL
+//     );
+//   `;
 
-  try {
-    await pool.query(createArticlesQuery);
-    await pool.query(createEducationQuery);
-    console.log("Tabel 'articles' dan 'education' berhasil dibuat.");
-  } catch (err) {
-    console.error("Kesalahan saat membuat tabel:", err);
-  }
-};
+//   try {
+//     await pool.query(createArticlesQuery);
+//     await pool.query(createEducationQuery);
+//     console.log("Tabel 'articles' dan 'education' berhasil dibuat.");
+//   } catch (err) {
+//     console.error("Kesalahan saat membuat tabel:", err);
+//   }
+// };
 
-// Panggil fungsi createTables saat server mulai
-createTables();
+// // Panggil fungsi createTables saat server mulai
+// createTables();
 
 app.get("/", (req, res) => {
   console.log("welcome app");
@@ -88,12 +90,15 @@ app.get('/articles/:id', async (req, res) => {
 });
 
 // Endpoint untuk menambahkan artikel baru
-app.post('/articles', async (req, res) => {
+app.post('/articles',upload.single("foto"), async (req, res) => {
   const { title, content, category } = req.body;
+  const foto = req.file
   try {
+    const fotoPath = `${req.protocol}://${req.get("host")}/${foto.path}`;
+    const fotos = fotoPath.replace(/\\/g, "/");
     const result = await pool.query(
-      'INSERT INTO articles (title, content, category) VALUES ($1, $2, $3) RETURNING *',
-      [title, content, category]
+      'INSERT INTO articles (title, content, category,foto) VALUES ($1, $2, $3, $4) RETURNING *',
+      [title, content, category,fotos]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -177,10 +182,11 @@ app.delete('/education/:id', async (req, res) => {
   }
 });
 
-// Jalankan server
-// app.listen(PORT, () => {
-//   console.log(`Server berjalan di http://localhost:${PORT}`);
-// });
+app.use("/public/upload", express.static("public/upload"))
+
+app.listen(PORT, () => {
+  console.log(`Server berjalan di http://localhost:${PORT}`);
+});
 
 // Ekspor aplikasi sebagai fungsi untuk Firebase
-exports.app = functions.https.onRequest(app);
+// exports.app = functions.https.onRequest(app);
