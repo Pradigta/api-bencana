@@ -182,6 +182,50 @@ app.delete('/education/:id', async (req, res) => {
   }
 });
 
+app.post('/evaluasi', async (req, res) => {
+  const { nama, lokasi, elevasi, curah_hujan, jarak_dari_patahan, kepadatan_penduduk } = req.body;
+  
+  try {
+    const result = await pool.query(
+      'INSERT INTO evaluasi (nama, titik_lokasi, elevasi, curah_hujan, jarak_dari_patahan, kepadatan_penduduk) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [nama, lokasi, elevasi, curah_hujan, jarak_dari_patahan, kepadatan_penduduk]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/evaluasi', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM evaluasi');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint untuk mendapatkan informasi bencana berdasarkan ID (GET)
+app.get('/evaluasi/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  
+  try {
+    const result = await pool.query('SELECT * FROM evaluasi WHERE id = $1', [id]);
+    const bencana = result.rows[0];
+    
+    if (bencana) {
+      res.json(bencana);
+    } else {
+      res.status(404).json({ message: 'evaluasi tidak ditemukan' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.use("/public/upload", express.static("public/upload"))
 
 app.listen(PORT, () => {
